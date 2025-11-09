@@ -17,17 +17,22 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
+# Основная программа
 add_executable(laba4_oop
     src/main.cpp
 )
 
+# Тесты
 add_executable(laba4_tests
     tests/test_figures.cpp
     tests/main_test.cpp
 )
 
+# Только include директории
 target_include_directories(laba4_oop PRIVATE include)
 target_include_directories(laba4_tests PRIVATE include)
+
+# НЕ добавляем .ipp файлы в target_sources!
 
 target_link_libraries(laba4_tests PRIVATE gtest_main)
 

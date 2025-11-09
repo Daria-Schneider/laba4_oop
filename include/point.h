@@ -1,8 +1,7 @@
 #pragma once
 #include <iostream>
-#include "concepts.h"
 
-template<Scalar T>
+template<typename T>
 class Point {
 public:
     Point() : _x{0}, _y{0} {}

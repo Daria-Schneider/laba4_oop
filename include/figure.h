@@ -4,13 +4,10 @@
 #include <iostream>
 #include "point.h"
 
-template<Scalar T>
+template<typename T>
 class Figure {
 public:
-    Figure(size_t vertex_count) 
-        : _vertices{std::make_unique<Point<T>[]>(vertex_count)}
-        , _vertex_count{vertex_count} {}
-    
+    Figure(size_t vertex_count);
     virtual ~Figure() = default;
     
     Figure(const Figure&) = delete;
@@ -21,83 +18,32 @@ public:
     virtual T area() const = 0;
     virtual Point<T> center() const = 0;
     
-    virtual explicit operator double() const {
-        return static_cast<double>(area());
-    }
+    virtual explicit operator double() const;
     
-    Point<T>& vertex(size_t index) { 
-        if (index >= _vertex_count) throw std::out_of_range("Vertex index out of range");
-        return _vertices[index]; 
-    }
+    Point<T>& vertex(size_t index);
+    const Point<T>& vertex(size_t index) const;
     
-    const Point<T>& vertex(size_t index) const { 
-        if (index >= _vertex_count) throw std::out_of_range("Vertex index out of range");
-        return _vertices[index]; 
-    }
+    size_t vertex_count() const;
     
-    size_t vertex_count() const { return _vertex_count; }
+    template<typename U>
+    friend bool operator==(const Figure<U>& a, const Figure<U>& b);
     
-    friend bool operator==(const Figure& a, const Figure& b) {
-        if (a._vertex_count != b._vertex_count) return false;
-        
-        for (size_t i = 0; i < a._vertex_count; ++i) {
-            if (a._vertices[i] != b._vertices[i]) return false;
-        }
-        return true;
-    }
+    template<typename U>
+    friend bool operator!=(const Figure<U>& a, const Figure<U>& b);
     
-    friend bool operator!=(const Figure& a, const Figure& b) {
-        return !(a == b);
-    }
+    template<typename U>
+    friend std::ostream& operator<<(std::ostream& os, const Figure<U>& fig);
     
-    friend std::ostream& operator<<(std::ostream& os, const Figure& fig) {
-        os << "[";
-        for (size_t i = 0; i < fig._vertex_count; ++i) {
-            os << fig._vertices[i];
-            if (i < fig._vertex_count - 1) os << ", ";
-        }
-        os << "]";
-        return os;
-    }
-    
-    friend std::istream& operator>>(std::istream& is, Figure& fig) {
-        for (size_t i = 0; i < fig._vertex_count; ++i) {
-            Point<T> p;
-            is >> p;
-            fig._vertices[i] = p;
-        }
-        return is;
-    }
+    template<typename U>
+    friend std::istream& operator>>(std::istream& is, Figure<U>& fig);
 
 protected:
-    T calculateArea() const {
-        if (_vertex_count < 3) return 0;
-        
-        T area = 0;
-        
-        for (size_t i = 0; i < _vertex_count; ++i) {
-            const Point<T>& current = _vertices[i];
-            const Point<T>& next = _vertices[(i + 1) % _vertex_count];
-            area += current.x() * next.y() - next.x() * current.y();
-        }
-        
-        return std::abs(area) / 2;
-    }
-    
-    Point<T> calculateCenter() const {
-        if (_vertex_count == 0) return Point<T>();
-        
-        T centerX = 0, centerY = 0;
-        
-        for (size_t i = 0; i < _vertex_count; ++i) {
-            centerX += _vertices[i].x();
-            centerY += _vertices[i].y();
-        }
-        
-        return Point<T>(centerX / _vertex_count, centerY / _vertex_count);
-    }
+    T calculateArea() const;
+    Point<T> calculateCenter() const;
 
 protected:
-    std::unique_ptr<Point<T>[]> _vertices;
+    std::shared_ptr<Point<T>[]> _vertices;
     size_t _vertex_count;
 };
+
+#include "../src/figure.ipp"
